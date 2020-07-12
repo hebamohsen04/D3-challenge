@@ -32,7 +32,7 @@ d3.csv("data.csv", function(data){
 
 // Create scales
 var xLinearScale = d3.scaleLinear()
-    .domain([8, d3.max(data,function(d){
+    .domain([0, 1+d3.max(data,function(d){
     return +d.poverty;
     })])
     .range([0, width]);
@@ -61,7 +61,7 @@ var circlesGroup = chartGroup.selectAll("circle")
     .append("circle")
    .attr("cx", d => xLinearScale(d.poverty))
    .attr("cy", d => yLinearScale(d.healthcare)) 
-    .attr("r", "15")
+    .attr("r", "20")
     .attr("fill", "blue")
     .classed("stateCircle", true)
 
@@ -74,14 +74,16 @@ chartGroup.selectAll("text")
     .attr("y", d => (yLinearScale(d.healthcare-0.28)))
     .classed("stateText", true)
     .text(d => d.abbr)
-    .on("mouseover", function(d) {
-        toolTip.show(d);
+    .on("mouseover", function(d, i) {
+        toolTip.show(d, this);
+        //toolTip.style('display', 'block')
     })
     .on("mouseout", function(d) {
-        toolTip.hide(d);
+        toolTip.hide();
+        //toolTip.style('display', 'none')
     });
 
-// x labels
+// y labels
 chartGroup.append("text")
     .attr("transform", "rotate(-90)")
     .attr("y", 0 - margin.left)
@@ -91,7 +93,7 @@ chartGroup.append("text")
     .attr("data-axis-name", "healthcare")
     .text("Lacks Healthcare(%)");
 
-// y labels
+// x labels
 chartGroup.append("text")
     .attr("transform", "translate(" + width / 2 + " ," + (height + margin.top + 20) + ")")
     .attr("data-axis-name", "poverty")
@@ -103,7 +105,7 @@ var toolTip = d3.tip()
     .attr("class", "tooltip")
     .offset([-10, 30])
     .html(function(d) {
-        return ('${d.abbr}<br>Healthcare (%): ${d.healthcare}%<br>Poverty: ${d.poverty}');
+        return (`${d.abbr}<br>Healthcare (%): ${d.healthcare}%<br>Poverty: ${d.poverty}`);
     });
 
 
@@ -112,7 +114,7 @@ chartGroup.call(toolTip);
 
 // Event listener for display and hide of ToolTip
 circlesGroup.on("mouseover", function(d) {
-    toolTip.show(d);
+    toolTip.show(d, this);
 })
     .on("mouseout", function(d, i){
         toolTip.hide(d);
